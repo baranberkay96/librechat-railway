@@ -110,6 +110,9 @@ Idle total ≈ 1.3 GB on Hobby ≈ $13–15/month (RAM) plus a few cents of CPU 
 - [x] All 5 services SUCCESS; `/health` 200; `/login` serves the UI.
 - [x] Admin login with the generated credentials returns ADMIN; `admin@example.com` with a guessed password is rejected; `/api/auth/register` → 403.
 - [x] `/api/search/enable` → true; Meilisearch indexes created; "RAG API is running and reachable" in the LibreChat log.
+- [x] Rule 29 on Railway: `LIBRECHAT_ADMIN_PASSWORD=short` → warning, deploy healthy, password unchanged; `MEILI_MASTER_KEY=tiny` → both sides use its SHA-256, search still on; a new valid `LIBRECHAT_ADMIN_PASSWORD` → "Password of … set", login works.
+- [x] Fresh deploy: no credential-fingerprint warning, `[schedules] engine started`.
+- [x] LibreChat and MongoDB healthy under a 0.5 GB limit (Free plan simulation).
 - [ ] Add your own OpenAI/Anthropic key in the UI and send a message (not done in tests: no real keys used).
 - [ ] With `RAG_OPENAI_API_KEY` set, upload a PDF and ask about it.
 - [ ] Redeploy LibreChat: avatar and uploaded files persist.
