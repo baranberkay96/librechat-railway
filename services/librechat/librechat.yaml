@@ -1,0 +1,23 @@
+# LibreChat configuration baked into this Railway template.
+# Override it by setting CONFIG_PATH on the LibreChat service to your own file URL
+# (for example a raw GitHub URL). Reference: https://www.librechat.ai/docs/configuration/librechat_yaml
+version: 1.3.17
+cache: true
+
+interface:
+  customWelcome: 'Welcome to LibreChat. Add your own API key from the model menu to start chatting.'
+
+endpoints:
+  custom:
+    # One key for hundreds of models. Each user enters their own OpenRouter key
+    # unless the operator sets OPENROUTER_KEY to a shared key.
+    - name: 'OpenRouter'
+      apiKey: '${OPENROUTER_KEY}'
+      baseURL: 'https://openrouter.ai/api/v1'
+      models:
+        default: ['openrouter/auto']
+        fetch: true
+      titleConvo: true
+      titleModel: 'current_model'
+      dropParams: ['stop']
+      modelDisplayLabel: 'OpenRouter'

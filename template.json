@@ -1,0 +1,461 @@
+{
+  "name": "LibreChat Private AI Chat (MongoDB + Meilisearch)",
+  "description": "Self-hosted AI chat for OpenAI, Claude, Gemini, OpenRouter, agents and RAG.",
+  "category": "AI/ML",
+  "tags": [
+    "librechat",
+    "ai-chat",
+    "chatgpt-alternative",
+    "llm",
+    "rag",
+    "agents",
+    "openai",
+    "anthropic"
+  ],
+  "image": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/librechat.svg",
+  "services": {
+    "LibreChat": {
+      "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/librechat.svg",
+      "source": {
+        "repo": "baranberkay96/librechat-railway",
+        "rootDirectory": "/services/librechat"
+      },
+      "healthcheckPath": "/health",
+      "healthcheckTimeout": 600,
+      "restartPolicyType": "ALWAYS",
+      "publicDomain": true,
+      "targetPort": 3080,
+      "volume": {
+        "mountPath": "/data"
+      },
+      "variables": {
+        "PORT": {
+          "defaultValue": "3080",
+          "description": "Port LibreChat listens on (domain and healthcheck).",
+          "required": false
+        },
+        "DOMAIN_CLIENT": {
+          "defaultValue": "https://${{RAILWAY_PUBLIC_DOMAIN}}",
+          "description": "Public URL of the app. Change it when you add a custom domain.",
+          "required": true
+        },
+        "DOMAIN_SERVER": {
+          "defaultValue": "https://${{RAILWAY_PUBLIC_DOMAIN}}",
+          "description": "Public URL of the API (same as DOMAIN_CLIENT).",
+          "required": true
+        },
+        "LIBRECHAT_ADMIN_EMAIL": {
+          "defaultValue": "admin@example.com",
+          "description": "Login email of the administrator created on first start (your own address works best).",
+          "required": false
+        },
+        "LIBRECHAT_ADMIN_PASSWORD": {
+          "defaultValue": "${{secret(24, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Administrator password (8-128 chars). Changing it and redeploying resets the admin password.",
+          "required": false
+        },
+        "ALLOW_REGISTRATION": {
+          "defaultValue": "false",
+          "description": "Let visitors create accounts on the login page. Off by default; turn on to onboard your team.",
+          "required": false
+        },
+        "ALLOW_EMAIL_LOGIN": {
+          "defaultValue": "true",
+          "description": "Email and password login.",
+          "required": false
+        },
+        "ALLOW_SOCIAL_LOGIN": {
+          "defaultValue": "false",
+          "description": "Social/OAuth login (configure providers first).",
+          "required": false
+        },
+        "ALLOW_UNVERIFIED_EMAIL_LOGIN": {
+          "defaultValue": "true",
+          "description": "Allow login without email verification (no email service is configured).",
+          "required": false
+        },
+        "ALLOW_PASSWORD_RESET": {
+          "defaultValue": "false",
+          "description": "Password reset by email (needs an email service).",
+          "required": false
+        },
+        "OPENAI_API_KEY": {
+          "defaultValue": "user_provided",
+          "description": "user_provided = every user enters their own OpenAI key in the UI. Put a key here to share one.",
+          "required": false
+        },
+        "ANTHROPIC_API_KEY": {
+          "defaultValue": "user_provided",
+          "description": "user_provided = every user enters their own Anthropic key. Put a key here to share one.",
+          "required": false
+        },
+        "GOOGLE_KEY": {
+          "defaultValue": "user_provided",
+          "description": "user_provided = every user enters their own Google AI key. Put a key here to share one.",
+          "required": false
+        },
+        "OPENROUTER_KEY": {
+          "defaultValue": "user_provided",
+          "description": "OpenRouter endpoint key; user_provided = every user enters their own.",
+          "required": false
+        },
+        "CREDS_KEY": {
+          "defaultValue": "${{secret(64, \"0123456789abcdef\")}}",
+          "description": "Encrypts stored user API keys (64 hex chars). Never change after first start.",
+          "required": true
+        },
+        "CREDS_IV": {
+          "defaultValue": "${{secret(32, \"0123456789abcdef\")}}",
+          "description": "Encryption IV for stored user API keys (32 hex chars). Never change.",
+          "required": true
+        },
+        "JWT_SECRET": {
+          "defaultValue": "${{secret(64, \"0123456789abcdef\")}}",
+          "description": "Signs login sessions; also used by the RAG API.",
+          "required": true
+        },
+        "JWT_REFRESH_SECRET": {
+          "defaultValue": "${{secret(64, \"0123456789abcdef\")}}",
+          "description": "Signs refresh tokens.",
+          "required": true
+        },
+        "MONGO_HOST": {
+          "defaultValue": "${{MongoDB.RAILWAY_PRIVATE_DOMAIN}}",
+          "description": "MongoDB host on the private network.",
+          "required": true
+        },
+        "MONGO_USER": {
+          "defaultValue": "${{MongoDB.MONGO_INITDB_ROOT_USERNAME}}",
+          "description": "MongoDB user.",
+          "required": true
+        },
+        "MONGO_PASSWORD": {
+          "defaultValue": "${{MongoDB.MONGO_INITDB_ROOT_PASSWORD}}",
+          "description": "MongoDB password.",
+          "required": true
+        },
+        "MONGO_DATABASE": {
+          "defaultValue": "LibreChat",
+          "description": "MongoDB database name.",
+          "required": false
+        },
+        "MONGO_URI": {
+          "defaultValue": "",
+          "description": "Optional full MongoDB URI (e.g. Atlas). Overrides MONGO_HOST/USER/PASSWORD when set.",
+          "required": false
+        },
+        "SEARCH": {
+          "defaultValue": "true",
+          "description": "Conversation search through Meilisearch.",
+          "required": false
+        },
+        "MEILI_HOST": {
+          "defaultValue": "http://${{Meilisearch.RAILWAY_PRIVATE_DOMAIN}}:7700",
+          "description": "Meilisearch URL on the private network.",
+          "required": false
+        },
+        "MEILI_MASTER_KEY": {
+          "defaultValue": "${{Meilisearch.MEILI_MASTER_KEY}}",
+          "description": "Same key as on the Meilisearch service.",
+          "required": false
+        },
+        "MEILI_NO_ANALYTICS": {
+          "defaultValue": "true",
+          "description": "Disable Meilisearch client analytics.",
+          "required": false
+        },
+        "RAG_API_URL": {
+          "defaultValue": "http://${{rag-api.RAILWAY_PRIVATE_DOMAIN}}:8000",
+          "description": "RAG API for chatting with uploaded files.",
+          "required": false
+        },
+        "APP_TITLE": {
+          "defaultValue": "LibreChat",
+          "description": "Title shown in the browser and login page.",
+          "required": false
+        },
+        "NO_INDEX": {
+          "defaultValue": "true",
+          "description": "Ask search engines not to index this instance.",
+          "required": false
+        },
+        "TRUST_PROXY": {
+          "defaultValue": "1",
+          "description": "Railway's edge is one proxy hop (correct client IPs for rate limits).",
+          "required": false
+        },
+        "DEBUG_LOGGING": {
+          "defaultValue": "false",
+          "description": "Verbose debug log files.",
+          "required": false
+        },
+        "ALLOW_SHARED_LINKS": {
+          "defaultValue": "true",
+          "description": "Users can share conversations by link (login required to view).",
+          "required": false
+        },
+        "ALLOW_SHARED_LINKS_PUBLIC": {
+          "defaultValue": "false",
+          "description": "Shared links readable without login.",
+          "required": false
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "defaultValue": "30",
+          "description": "Time running chats get to finish on redeploy.",
+          "required": false
+        }
+      }
+    },
+    "MongoDB": {
+      "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/mongodb.svg",
+      "source": {
+        "image": "mongo:8.0.38-noble@sha256:76a93cc399d05709baeea4e55385749657aa0085ad5b497c851380778eccea2c"
+      },
+      "startCommand": "docker-entrypoint.sh mongod --ipv6 --bind_ip ::,0.0.0.0 --setParameter diagnosticDataCollectionEnabled=false",
+      "restartPolicyType": "ALWAYS",
+      "publicDomain": false,
+      "volume": {
+        "mountPath": "/data/db"
+      },
+      "variables": {
+        "MONGOHOST": {
+          "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}",
+          "description": "Railway private domain name.",
+          "required": false
+        },
+        "MONGOPORT": {
+          "defaultValue": "27017",
+          "description": "MongoDB port.",
+          "required": false
+        },
+        "MONGOUSER": {
+          "defaultValue": "${{MONGO_INITDB_ROOT_USERNAME}}",
+          "description": "MongoDB user.",
+          "required": false
+        },
+        "MONGOPASSWORD": {
+          "defaultValue": "${{MONGO_INITDB_ROOT_PASSWORD}}",
+          "description": "Root password.",
+          "required": false
+        },
+        "MONGO_URL": {
+          "defaultValue": "mongodb://${{MONGO_INITDB_ROOT_USERNAME}}:${{MONGO_INITDB_ROOT_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:27017",
+          "description": "Private URL to connect to MongoDB.",
+          "required": false
+        },
+        "MONGO_INITDB_ROOT_USERNAME": {
+          "defaultValue": "mongo",
+          "description": "User created during initialization, given the root role.",
+          "required": true
+        },
+        "MONGO_INITDB_ROOT_PASSWORD": {
+          "defaultValue": "${{secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\")}}",
+          "description": "Root password, set during initialization.",
+          "required": true
+        }
+      }
+    },
+    "Meilisearch": {
+      "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/meilisearch.svg",
+      "source": {
+        "image": "getmeili/meilisearch:v1.56.2@sha256:9600db22be3fcbf3d506176d3a73dd70a65c5719d9aa1d2837355b75afb8f4fb"
+      },
+      "startCommand": "/bin/sh -c 'k=\"${MEILI_MASTER_KEY:-}\"; if [ -z \"$k\" ]; then echo \"[railway] WARNING: MEILI_MASTER_KEY is empty; using a random key, LibreChat search stays off until you set one.\"; k=$(head -c 32 /dev/urandom | sha256sum | cut -c1-64); elif [ ${#k} -lt 16 ]; then echo \"[railway] WARNING: MEILI_MASTER_KEY is shorter than 16 characters; using its SHA-256 instead.\"; k=$(printf %s \"$k\" | sha256sum | cut -c1-64); fi; export MEILI_MASTER_KEY=\"$k\"; exec /bin/meilisearch'",
+      "healthcheckPath": "/health",
+      "healthcheckTimeout": 300,
+      "restartPolicyType": "ALWAYS",
+      "publicDomain": false,
+      "volume": {
+        "mountPath": "/meili_data"
+      },
+      "variables": {
+        "PORT": {
+          "defaultValue": "7700",
+          "description": "Meilisearch port (healthcheck).",
+          "required": false
+        },
+        "MEILI_HTTP_ADDR": {
+          "defaultValue": "[::]:7700",
+          "description": "Listen on IPv4 and IPv6 (private network).",
+          "required": false
+        },
+        "MEILI_ENV": {
+          "defaultValue": "production",
+          "description": "Production mode: master key required, no public dashboard.",
+          "required": false
+        },
+        "MEILI_DB_PATH": {
+          "defaultValue": "/meili_data/data.ms",
+          "description": "Index data on the volume.",
+          "required": false
+        },
+        "MEILI_MASTER_KEY": {
+          "defaultValue": "${{secret(48, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Master key (at least 16 characters); LibreChat uses the same value.",
+          "required": true
+        },
+        "MEILI_NO_ANALYTICS": {
+          "defaultValue": "true",
+          "description": "Disable Meilisearch telemetry.",
+          "required": false
+        }
+      }
+    },
+    "rag-api": {
+      "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/librechat.svg",
+      "source": {
+        "image": "ghcr.io/danny-avila/librechat-rag-api-dev-lite:v0.9.0@sha256:18a8dffa9316276b924bf3fd23bfb4544b0f68f8f6b14c048affb35c01721a35"
+      },
+      "startCommand": "/bin/sh -c 'if [ -z \"${RAG_OPENAI_API_KEY:-}\" ]; then case \"${OPENAI_API_KEY:-}\" in \"\"|user_provided) echo \"[railway] RAG API: no embeddings key (RAG_OPENAI_API_KEY) yet; file search answers with an error until you add one.\"; export RAG_OPENAI_API_KEY=not-configured ;; *) export RAG_OPENAI_API_KEY=\"$OPENAI_API_KEY\" ;; esac; fi; exec python main.py'",
+      "healthcheckPath": "/health",
+      "healthcheckTimeout": 600,
+      "restartPolicyType": "ALWAYS",
+      "publicDomain": false,
+      "variables": {
+        "PORT": {
+          "defaultValue": "8000",
+          "description": "RAG API port (healthcheck).",
+          "required": false
+        },
+        "RAG_PORT": {
+          "defaultValue": "8000",
+          "description": "RAG API port.",
+          "required": false
+        },
+        "RAG_HOST": {
+          "defaultValue": "0.0.0.0",
+          "description": "Bind address (uvicorn).",
+          "required": false
+        },
+        "DB_HOST": {
+          "defaultValue": "${{Postgres.RAILWAY_PRIVATE_DOMAIN}}",
+          "description": "pgvector Postgres host.",
+          "required": true
+        },
+        "DB_PORT": {
+          "defaultValue": "5432",
+          "description": "Postgres port.",
+          "required": false
+        },
+        "POSTGRES_DB": {
+          "defaultValue": "${{Postgres.PGDATABASE}}",
+          "description": "Postgres database.",
+          "required": true
+        },
+        "POSTGRES_USER": {
+          "defaultValue": "${{Postgres.PGUSER}}",
+          "description": "Postgres user.",
+          "required": true
+        },
+        "POSTGRES_PASSWORD": {
+          "defaultValue": "${{Postgres.PGPASSWORD}}",
+          "description": "Postgres password.",
+          "required": true
+        },
+        "JWT_SECRET": {
+          "defaultValue": "${{LibreChat.JWT_SECRET}}",
+          "description": "Same value as on LibreChat (verifies requests).",
+          "required": true
+        },
+        "EMBEDDINGS_PROVIDER": {
+          "defaultValue": "openai",
+          "description": "Embeddings provider (openai, azure, ollama, huggingfacetei, bedrock, ...).",
+          "required": false
+        },
+        "EMBEDDINGS_MODEL": {
+          "defaultValue": "text-embedding-3-small",
+          "description": "Embeddings model.",
+          "required": false
+        },
+        "RAG_OPENAI_API_KEY": {
+          "defaultValue": "",
+          "description": "OpenAI key for embeddings (needed for file search). Empty = falls back to LibreChat's OPENAI_API_KEY if that is a real key.",
+          "required": false
+        },
+        "OPENAI_API_KEY": {
+          "defaultValue": "${{LibreChat.OPENAI_API_KEY}}",
+          "description": "LibreChat's OpenAI key (used for embeddings only when it is a real key).",
+          "required": false
+        },
+        "DEBUG_RAG_API": {
+          "defaultValue": "false",
+          "description": "Debug logging.",
+          "required": false
+        }
+      }
+    },
+    "Postgres": {
+      "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/postgresql.svg",
+      "source": {
+        "image": "ghcr.io/railwayapp-templates/postgres-ssl:18.6@sha256:4fc833b43d2aaf6ecc9b18615f5533602b723a32d0e2efe2dae8ca0f7217c863"
+      },
+      "restartPolicyType": "ALWAYS",
+      "publicDomain": false,
+      "volume": {
+        "mountPath": "/var/lib/postgresql/data"
+      },
+      "variables": {
+        "PGDATA": {
+          "defaultValue": "/var/lib/postgresql/data/pgdata",
+          "description": "Location where the database will be initialized",
+          "required": true
+        },
+        "PGHOST": {
+          "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}",
+          "description": "Railway Private Domain Name.",
+          "required": true
+        },
+        "PGPORT": {
+          "defaultValue": "5432",
+          "description": "Port to connect to Postgres.",
+          "required": true
+        },
+        "PGUSER": {
+          "defaultValue": "${{ POSTGRES_USER }}",
+          "description": "Required variable for Data panel",
+          "required": true
+        },
+        "PGDATABASE": {
+          "defaultValue": "${{POSTGRES_DB}}",
+          "description": "Required variable for the data panel.",
+          "required": true
+        },
+        "PGPASSWORD": {
+          "defaultValue": "${{POSTGRES_PASSWORD}}",
+          "description": "Required variable for Data panel",
+          "required": true
+        },
+        "POSTGRES_DB": {
+          "defaultValue": "railway",
+          "description": "Default database created when image is started.",
+          "required": true
+        },
+        "DATABASE_URL": {
+          "defaultValue": "postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}",
+          "description": "URL to connect to Postgres (vectors for the RAG API).",
+          "required": true
+        },
+        "POSTGRES_USER": {
+          "defaultValue": "postgres",
+          "description": "User to connect to Postgres DB",
+          "required": true
+        },
+        "SSL_CERT_DAYS": {
+          "defaultValue": "820",
+          "description": "SSL certificate expiry in days.",
+          "required": false
+        },
+        "POSTGRES_PASSWORD": {
+          "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}",
+          "description": "Password to connect to DB",
+          "required": true
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "defaultValue": "60",
+          "description": "Allow Postgres to cleanly shut down",
+          "required": true
+        }
+      }
+    }
+  }
+}
