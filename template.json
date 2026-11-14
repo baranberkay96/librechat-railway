@@ -199,6 +199,11 @@
           "description": "Shared links readable without login.",
           "required": false
         },
+        "SCHEDULES_SINGLE_PROCESS": {
+          "defaultValue": "true",
+          "description": "Scheduled chats (beta): confirms this is the only LibreChat replica.",
+          "required": false
+        },
         "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
           "defaultValue": "30",
           "description": "Time running chats get to finish on redeploy.",
@@ -252,6 +257,11 @@
           "defaultValue": "${{secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\")}}",
           "description": "Root password, set during initialization.",
           "required": true
+        },
+        "GLIBC_TUNABLES": {
+          "defaultValue": "glibc.pthread.rseq=1",
+          "description": "Turns off TCMalloc per-CPU caches: less idle RAM, and mongod 8.0 starts on every host kernel (SERVER-121912).",
+          "required": false
         }
       }
     },

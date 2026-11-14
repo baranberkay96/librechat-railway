@@ -7,6 +7,13 @@ const path = require('path');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+// Same credential bootstrap as the server, so the fingerprints recorded below match it.
+require('../api/config/credentials');
+const {
+  getCredentialFingerprints,
+  credentialMetadataCollection,
+  credentialMetadataId,
+} = require('@librechat/api');
 const { User } = require('@librechat/data-schemas').createModels(mongoose);
 require('module-alias')({ base: path.resolve(__dirname, '..', 'api') });
 const { connectDb } = require('~/db/connect');
@@ -67,7 +74,27 @@ async function updateExisting(existing, password) {
   log(`Administrator ${existing.email} is ready.`);
 }
 
+async function recordCredentialFingerprints() {
+  // LibreChat records credential fingerprints only while the database has no users. The admin is
+  // created before the server's first start, so record them here the same way the server would.
+  if (await User.exists({})) {
+    return;
+  }
+  await mongoose.connection.db.collection(credentialMetadataCollection).updateOne(
+    { _id: credentialMetadataId },
+    {
+      $setOnInsert: {
+        _id: credentialMetadataId,
+        fingerprints: getCredentialFingerprints(),
+        createdAt: new Date(),
+      },
+    },
+    { upsert: true },
+  );
+}
+
 async function createAdmin(email, password) {
+  await recordCredentialFingerprints();
   const secret = password || crypto.randomBytes(24).toString('base64url');
   let username = 'admin';
   if (await User.exists({ username })) {
