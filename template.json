@@ -260,7 +260,7 @@
         },
         "GLIBC_TUNABLES": {
           "defaultValue": "glibc.pthread.rseq=1",
-          "description": "Turns off TCMalloc per-CPU caches: less idle RAM, and mongod 8.0 starts on every host kernel (SERVER-121912).",
+          "description": "Turns off TCMalloc per-CPU caches so mongod 8.0 starts on every host kernel (SERVER-121912).",
           "required": false
         }
       }

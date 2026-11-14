@@ -33,13 +33,13 @@ LibreChat is a Node.js application. It keeps users, conversations, agents and se
 
 ### Implementation Details
 
-| Service | Image | Role | Memory (idle, measured) |
+| Service | Image | Role | Idle RAM (measured) |
 |---|---|---|---|
 | `LibreChat` | `librechat:v0.8.8` + Railway launcher | Web app and API, volume `/data` | ~0.35 GB |
-| `MongoDB` | `mongo:8.0.38` | Users, chats, agents, settings | ~0.15 GB |
-| `Meilisearch` | `meilisearch:v1.56.2` | Conversation search | ~0.05 GB |
-| `rag-api` | `librechat-rag-api-dev-lite:v0.9.0` | Document parsing and embeddings | ~0.3 GB |
-| `Postgres` | `postgres-ssl:18.6` (pgvector) | Vector store for the RAG API | ~0.05 GB |
+| `MongoDB` | `mongo:8.0.38` | Users, chats, agents, settings | ~0.5 GB (0.27 GB under a 0.5 GB limit) |
+| `Meilisearch` | `meilisearch:v1.56.2` | Conversation search | ~0.1–0.19 GB |
+| `rag-api` | `librechat-rag-api-dev-lite:v0.9.0` | Document parsing and embeddings | ~0.2 GB |
+| `Postgres` | `postgres-ssl:18.6` (pgvector) | Vector store for the RAG API | ~0.1 GB |
 
 **First login.** Open the LibreChat domain and sign in with `LIBRECHAT_ADMIN_EMAIL` (default `admin@example.com`) and the generated `LIBRECHAT_ADMIN_PASSWORD`, both on the LibreChat service's Variables tab. The account has the ADMIN role. To use another email, change `LIBRECHAT_ADMIN_EMAIL` before deploying or later (a redeploy creates the new admin). Changing `LIBRECHAT_ADMIN_PASSWORD` and redeploying resets the admin password.
 
@@ -51,7 +51,7 @@ LibreChat is a Node.js application. It keeps users, conversations, agents and se
 
 **Configuration.** A small `librechat.yaml` is built in (OpenRouter endpoint, welcome text). To use your own, set `CONFIG_PATH` on LibreChat to a raw file URL and redeploy.
 
-**Plans.** Five services, about 0.9 GB RAM in total when idle. Each service fits Railway's Trial (1 GB per service) and Free (0.5 GB per service) limits at idle. For busy teams or large uploads, Hobby or Pro is recommended.
+**Plans.** Five services, about 1.3 GB RAM in total when idle (MongoDB uses less when its limit is lower). LibreChat and MongoDB were tested with a 0.5 GB limit, as on Railway's Free plan, and stay under it at idle; the other three services idle below 0.2 GB. Trial allows 1 GB per service. For busy teams or large uploads, Hobby or Pro is recommended.
 
 **Scaling.** LibreChat keeps uploads on its volume, so run one replica and give it more memory and CPU as usage grows. MongoDB, Meilisearch and the RAG API scale vertically.
 
