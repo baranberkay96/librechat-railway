@@ -1,5 +1,7 @@
 # Deploy and Host LibreChat with Railway
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/librechat-private-ai-chat-mongodb-meilis?referralCode=20H68q)
+
 LibreChat is an open-source AI chat platform with one interface for OpenAI, Anthropic, Google, OpenRouter and many other model providers, plus agents, file chat (RAG), conversation search and multi-user accounts. This community template runs LibreChat v0.8.8 with MongoDB, Meilisearch and a RAG API on Postgres with pgvector.
 
 ## About Hosting LibreChat
